@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,23 +6,27 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
-} from 'react-native';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import Home from "../assets/svg/home.js"
-import AntDesign from '@expo/vector-icons/AntDesign';
-import * as ImagePicker from 'expo-image-picker';
+} from "react-native";
+// import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Cart from "../assets/svg/Vector.js";
+import Myorder from "../assets/svg/myorder.js";
+import Logout from "../assets/svg/logout.js";
 
-export default function Logout() {
+import AntDesign from "@expo/vector-icons/AntDesign";
+import * as ImagePicker from "expo-image-picker";
+
+export default function Profile() {
   const [profileImage, setProfileImage] = useState(
-    'https://www.securityforum.org/wp-content/uploads/2022/10/Alex-Jordon-scaled-e1710797283626.jpeg'
+    "https://www.securityforum.org/wp-content/uploads/2022/10/Alex-Jordon-scaled-e1710797283626.jpeg"
   );
-  const [selectedGender, setSelectedGender] = useState('Male');
+  const [selectedGender, setSelectedGender] = useState("Male");
 
   // Function to handle image upload
   const handleImageUpload = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-      alert('Permission to access media library is required!');
+      alert("Permission to access media library is required!");
       return;
     }
 
@@ -41,8 +45,10 @@ export default function Logout() {
   return (
     <View style={styles.container}>
       {/* Profile Image Section */}
-      {/* <Home/> */}
-      <TouchableOpacity style={styles.imageContainer} onPress={handleImageUpload}>
+      <TouchableOpacity
+        style={styles.imageContainer}
+        onPress={handleImageUpload}
+      >
         <Image source={{ uri: profileImage }} style={styles.profileImage} />
         <Text style={styles.uploadText}>Upload Image</Text>
       </TouchableOpacity>
@@ -70,14 +76,14 @@ export default function Logout() {
           <TouchableOpacity
             style={[
               styles.genderButton,
-              selectedGender === 'Male' && styles.genderButtonActive,
+              selectedGender === "Male" && styles.genderButtonActive,
             ]}
-            onPress={() => setSelectedGender('Male')}
+            onPress={() => setSelectedGender("Male")}
           >
             <Text
               style={[
                 styles.genderText,
-                selectedGender === 'Male' && styles.genderTextActive,
+                selectedGender === "Male" && styles.genderTextActive,
               ]}
             >
               Male
@@ -86,14 +92,14 @@ export default function Logout() {
           <TouchableOpacity
             style={[
               styles.genderButton,
-              selectedGender === 'Female' && styles.genderButtonActive,
+              selectedGender === "Female" && styles.genderButtonActive,
             ]}
-            onPress={() => setSelectedGender('Female')}
+            onPress={() => setSelectedGender("Female")}
           >
             <Text
               style={[
                 styles.genderText,
-                selectedGender === 'Female' && styles.genderTextActive,
+                selectedGender === "Female" && styles.genderTextActive,
               ]}
             >
               Female
@@ -104,16 +110,17 @@ export default function Logout() {
 
       {/* My Orders */}
       <View style={styles.orderSection}>
-  <TouchableOpacity style={styles.orderButton}>
-    <MaterialIcons name="production-quantity-limits" size={24} color="black" />
-    <Text style={styles.orderText}>My Order</Text>
-    <AntDesign name="arrowright" size={24} color="black" />
-  </TouchableOpacity>
-</View>
+        <TouchableOpacity style={styles.orderButton}>
+          <Myorder style={{ width: 50, height: 50, top: 4 }} color="#000" />
 
+          <Text style={styles.orderText}>My Order</Text>
+          <AntDesign name="arrowright" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
 
       {/* Logout Button */}
       <TouchableOpacity style={styles.logoutButton}>
+        <Logout style={{ width: 24, height: 24 }} color="#fff" />
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
     </View>
@@ -123,12 +130,12 @@ export default function Logout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 20,
     paddingTop: 70,
   },
   imageContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   profileImage: {
@@ -139,64 +146,66 @@ const styles = StyleSheet.create({
   },
   uploadText: {
     fontSize: 14,
-    color: '#777',
+    color: "181C2E",
+    fontFamily: 'psb',
+    textAlign: "center",
   },
   infoContainer: {
     marginBottom: 20,
   },
   inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
   },
   label: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: 14,
+    color: "#666",
     width: 80,
-    fontFamily: 'Poppins-Regular',
+    fontFamily: "psb",
   },
   input: {
     flex: 1,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
     fontSize: 16,
     paddingVertical: 5,
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'pr',
   },
   genderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 15,
   },
   genderButton: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 20,
     paddingHorizontal: 15,
     paddingVertical: 5,
     marginLeft: 10,
   },
   genderButtonActive: {
-    borderColor: '#f57c00',
-    backgroundColor: '#f57c00',
+    // borderColor: "#f57c00",
+    backgroundColor: "orange",
   },
   genderText: {
-    color: '#333',
-    fontFamily: 'Poppins-Regular',
+    color: "#333",
+    fontFamily: 'pr',
   },
   genderTextActive: {
-    color: '#fff',
+    color: "#fff",
   },
   orderSection: {
     marginBottom: 20,
   },
   orderButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 10,
-    padding: 10,
+    // padding: 5,
   },
   orderIcon: {
     width: 24,
@@ -205,19 +214,26 @@ const styles = StyleSheet.create({
   },
   orderText: {
     fontSize: 16,
-    color: '#333',
-    fontFamily: 'Poppins-Regular',
+    color: "#333",
+    fontFamily: "psb",
     flex: 1,
+    textAlign: "left",
+    // paddingLeft: 10,
   },
   logoutButton: {
-    backgroundColor: '#f57c00',
+    backgroundColor: "orange", // Orange color for the button
     borderRadius: 10,
-    padding: 15,
-    alignItems: 'center',
+    paddingVertical: 10, // Adjust vertical padding for spacing
+    paddingHorizontal: 20, // Adjust horizontal padding for spacing
+    flexDirection: "row", // Align icon and text horizontally
+    alignItems: "center", // Center content vertically within the button
+    justifyContent: "center", // Align content to the center horizontally
+    height: 50, // Set the height of the button for consistent layout
   },
   logoutText: {
-    fontSize: 18,
-    color: '#fff',
-    fontFamily: 'Poppins-Regular',
+    fontSize: 20, // Set font size to 20 for the text
+    color: "#fff", // White text color
+    fontFamily: 'psb', // Ensure you have 'psb' font loaded
+    marginLeft: 10, // Space between the icon and the text
   },
 });

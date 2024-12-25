@@ -66,6 +66,7 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -99,23 +100,29 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   welcomeText: {
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#181C2E',
+    lineHeight: 40,
+    fontFamily : "pr"
+
   },
   appName: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#f78c1f',
+    color: '#666',
+    fontFamily : "pr"
   },
   dashboardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 15,
+    fontFamily : "pb",
+    color: '#181C2E',
     marginBottom: 10,
   },
   dashboardContainer: {
     paddingBottom: 20,
+
+
   },
   card: {
     flexDirection: 'row',
@@ -130,18 +137,21 @@ const styles = StyleSheet.create({
     elevation: 10,
     borderRadius : 20,
     shadowOffset: { width: 0, height: 10 },
+    
   },
   cardIcon: {
     marginRight: 15,
   },
   cardValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+  fontSize: 16,
+  fontFamily:"pb",
+  color: '#181C2E',
+  
   },
   cardTitle: {
-    fontSize: 14,
-    color: '#888',
+    fontSize: 13,
+    color: '#666',
+    fontFamily:"pr"
   },
   bottomNav: {
     flexDirection: 'row',

@@ -4,8 +4,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "../../SCREENS/Login.js";
 import Main1 from "../../SCREENS/Main1.js";
-import HomeScreen from "../../SCREENS/screen1.js"
-import useLoadFonts from "../../hooks/fontload.js"
+import HomeScreen from "../../SCREENS/screen1.js";
+import useLoadFonts from "../../hooks/fontload.js";
+import Addtocart from "@/SCREENS/screen3.js";
+import SuccessPage from "@/SCREENS/screen4.js";
+import Order from "@/SCREENS/screen2.js";
+
 
 
 
@@ -40,8 +44,14 @@ if (!fontsLoaded) {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Main1" component={Main1} />
       <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Addtocart" component={Addtocart} />
+      <Stack.Screen name="SuccessPage" component={SuccessPage} />
+      <Stack.Screen name="Order" component={Order} /> 
+     
 
     </Stack.Navigator>
     // </NavigationContainer>
+
+    
   );
 }

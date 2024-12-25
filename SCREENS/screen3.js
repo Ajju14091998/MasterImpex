@@ -20,21 +20,23 @@ import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Setting from "../assets/svg/setting.js";
+import Delete from "../assets/svg/delete.js";
+import Checkout from "../assets/svg/proceed.js";
+import { useNavigation } from "@react-navigation/native";
 
-const Order = () => {
-  const bottomSheetRef1 = useRef(null);
-  const bottomSheetRef2 = useRef(null);
-  const snapPoints = React.useMemo(() => ["45%"], []);
+const Addtocart = () => {
+  const navigation = useNavigation(); // Initialize the navigation hook
 
-  const openDetailsSheet = () => {
-    if (bottomSheetRef1.current) {
-      bottomSheetRef1.current.expand();
-    }
+  const handleProceedToCheckout = () => {
+    navigation.navigate("SuccessPage"); // Navigate to "Screen4" when the button is clicked
   };
+  const bottomSheetRef = useRef(null);
+  const snapPoints = React.useMemo(() => ["45%"], []);
+  const open1 = () => {
+    console.log("hi");
 
-  const openFilterSheet = () => {
-    if (bottomSheetRef2.current) {
-      bottomSheetRef2.current.expand();
+    if (bottomSheetRef.current) {
+      bottomSheetRef.current.expand(); // Ensure ref is not null
     }
   };
 
@@ -68,18 +70,59 @@ const Order = () => {
       />
 
       <View style={styles.two}>
-        <Text style={styles.t1}>9 GL LAMINATE</Text>
-        <Text numberOfLines={2} ellipsizeMode="tail" style={styles.t2}>
-          lorem ipsum js skdhuduwd skadhugsdku skadhugsdku skadhugsdku{" "}
-        </Text>
         <View style={styles.t3}>
-          <Text style={styles.t1}>₹ 245</Text>
-          <Text style={styles.t1}>Qty 200</Text>
+          <Text style={styles.t1}>9 GL LAMINATE</Text>
+
+          <Delete
+            style={{
+              width: 25,
+              height: 25,
+              marginTop: 5,
+              marginLeft: 50, // Pushes the icon to the far-right
+              color: "#181C2E",
+            }}
+          />
+        </View>
+
+        {/* <Text numberOfLines={2} ellipsizeMode="tail" style={styles.t2}>
+        Price (₹) 245
+        </Text> */}
+        <View style={styles.t3}>
+          <Text style={styles.t2}>
+            Price(₹){" "}
+            <Text style={{ fontFamily: "psb", fontSize: 12, color: "#181C2E" }}>
+              245.00
+            </Text>
+          </Text>
+          <Text style={styles.t2}>
+            Quantity{" "}
+            <Text style={{ fontFamily: "psb", fontSize: 12, color: "#181C2E" }}>
+              200
+            </Text>
+          </Text>
+        </View>
+        <View style={styles.quantitySelector}>
+          <TouchableOpacity
+            onPress={handleDecrease}
+            style={styles.selectorButton}
+          >
+            <Text style={styles.selectorText}>-</Text>
+          </TouchableOpacity>
+          <TextInput
+            editable={false}
+            style={styles.input}
+            keyboardType="numeric"
+            value={quantity.toString()}
+            onChangeText={(value) => setQuantity(Number(value) || 1)}
+          />
+          <TouchableOpacity
+            onPress={handleIncrease}
+            style={styles.selectorButton}
+          >
+            <Text style={styles.selectorText}>+</Text>
+          </TouchableOpacity>
         </View>
       </View>
-      <Pressable style={styles.three} onPress={openDetailsSheet}>
-        <Entypo name="chevron-right" size={22} color="#fff" />
-      </Pressable>
     </View>
   );
   const renderBackdrop = (props) => (
@@ -107,24 +150,80 @@ const Order = () => {
             style={styles.searchInput}
             placeholderTextColor="#888"
           />
-          <Pressable style={styles.filter} onPress={openFilterSheet}>
+          <Pressable style={styles.filter} onPress={open1}>
             <Setting
               style={{ width: 50, height: 50 }} // Example to set the size of the icon
               color="#fff" // Dynamically change color based on 'focused' state
             />
           </Pressable>
         </View>
-        <Text style={styles.product}>Products</Text>
+        <Text style={styles.product}>My Cart</Text>
 
         <FlatList data={dashboardData} renderItem={renderCard}></FlatList>
+
+        <View
+          style={{
+            paddingVertical: 14,
+            backgroundColor: "#fff",
+            // borderTopLeftRadius: 20,
+            // borderTopRightRadius: 20,
+            paddingHorizontal: 15,
+            shadowColor: "#000",
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+          }}
+        >
+          {/* Total Section */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 15,
+            }}
+          >
+            <Text style={{ fontFamily: "psb", fontSize: 14, color: "#888" }}>
+              Total (3 items):
+            </Text>
+            <Text style={{ fontFamily: "psb", fontSize: 16, color: "#181C2E" }}>
+              ₹ 735
+            </Text>
+          </View>
+
+          {/* Proceed to Checkout Button */}
+          <TouchableOpacity
+            onPress={handleProceedToCheckout} // Add this handler to the button
+            style={{
+              backgroundColor: "orange",
+              borderRadius: 10,
+              alignItems: "center",
+              paddingVertical: 10,
+              flexDirection: "row", // Align text and icon horizontally
+              justifyContent: "center", // Center the content horizontally
+            }}
+          >
+            <Text style={{ fontFamily: "psb", fontSize: 16, color: "#fff" }}>
+              Proceed to Checkout
+            </Text>
+
+            <Checkout
+              style={{
+                width: 30, // Set the size of the icon
+                height: 30, // Ensure it fits well with the text
+                marginLeft: 60, // Space between the icon and text
+                color: "#fff", // Icon color (white)
+              }}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-      {/* arrow product openDetailsSheet bottomsheet */}
+
       <BottomSheet
         backdropComponent={renderBackdrop}
-        ref={bottomSheetRef1}
-        index={-1}
+        ref={bottomSheetRef}
+        index={-1} // Start closed
         snapPoints={snapPoints}
-        enablePanDownToClose={true}
+        enablePanDownToClose={true} // Allows swiping down to close
       >
         <View style={styles.container}>
           {/* Product Name and Availability */}
@@ -137,7 +236,7 @@ const Order = () => {
             }}
           >
             <View>
-              <Text style={styles.productName}>9 GL LAMINATE </Text>
+              <Text style={styles.productName}>9 GL LAMINATE</Text>
             </View>
             <View style={styles.availabilityContainer}>
               <Text style={styles.availabilityText}>Available in stock</Text>
@@ -150,9 +249,7 @@ const Order = () => {
             ellipsizeMode="tail"
             style={styles.description}
           >
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s ...
+            Price (₹) 245
           </Text>
 
           {/* Quantity and Selector */}
@@ -207,86 +304,6 @@ const Order = () => {
                 style={{ fontFamily: "pr", fontSize: 12, color: "#666666" }}
               >
                 Total Price
-              </Text>
-              <Text style={styles.price}>₹ {totalPrice}</Text>
-            </View>
-
-            {/* Add to Cart Button */}
-            <TouchableOpacity style={styles.addToCartButton}>
-              <Text style={styles.addToCartText}>Add to cart</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </BottomSheet>
-
-      {/* openFilterSheet bottomsheet */}
-      <BottomSheet
-        backdropComponent={renderBackdrop}
-        ref={bottomSheetRef2}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose={true}
-      >
-        <View style={styles.container}>
-          {/* Product Name and Availability */}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <View>
-              <Text style={styles.productName}>9 GL LAMINATE </Text>
-            </View>
-            <View style={styles.availabilityContainer}>
-              <Text style={styles.availabilityText}>Available in stock</Text>
-            </View>
-          </View>
-
-          {/* Product Description */}
-          <Text
-            numberOfLines={3}
-            ellipsizeMode="tail"
-            style={styles.description}
-          >
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s ...
-          </Text>
-
-          {/* Quantity and Selector */}
-          <View style={styles.quantityContainer}>
-            <View style={{ width: 100 }}>
-              <Text
-                style={{ fontFamily: "pr", fontSize: 12, color: "#666666" }}
-              >
-                Quantity
-              </Text>
-              <Text
-                style={{ fontFamily: "psb", fontSize: 16, color: "#181C2E" }}
-              >
-                200
-              </Text>
-            </View>
-          </View>
-
-          {/* Total Price */}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              marginTop: 10,
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <View style={styles.priceContainer}>
-              <Text
-                style={{ fontFamily: "pr", fontSize: 12, color: "#666666" }}
-              >
-                Total Price 1223345
               </Text>
               <Text style={styles.price}>₹ {totalPrice}</Text>
             </View>
@@ -436,7 +453,7 @@ const styles = StyleSheet.create({
   },
   t2: {
     fontFamily: "pr",
-    fontSize: 11,
+    fontSize: 10,
     color: "#666666",
     width: "100%",
     marginBottom: 5,
@@ -517,10 +534,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: 100,
     height: 35,
-
     overflow: "hidden",
     fontFamily: "pr",
     backgroundColor: "#f8f8f8",
+    marginBottom: 2,
   },
   selectorButton: {
     // padding: 10,
@@ -558,7 +575,7 @@ const styles = StyleSheet.create({
   addToCartButton: {
     backgroundColor: "orange",
     borderRadius: 10,
-    // paddingVertical: 12,
+
     width: 170,
     height: 36,
     marginTop: 2,
@@ -567,11 +584,11 @@ const styles = StyleSheet.create({
   addToCartText: {
     color: "#FFF",
     fontSize: 16,
-    // fontWeight: 'bold',
+
     paddingTop: 6,
     fontFamily: "psb",
     textAlign: "center",
   },
 });
 
-export default Order;
+export default Addtocart;
