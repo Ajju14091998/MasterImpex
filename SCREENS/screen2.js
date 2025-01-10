@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,37 +8,36 @@ import {
   Pressable,
   Image,
   TouchableOpacity,
+  Modal,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
 } from "react-native";
-import {
-  AntDesign,
-  FontAwesome5,
-  Ionicons,
-  MaterialIcons,
-} from "@expo/vector-icons";
-// import Home from "../assets/svg/home.js"
-import Entypo from "@expo/vector-icons/Entypo";
-import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AntDesign, Entypo } from "@expo/vector-icons";
 import Setting from "../assets/svg/setting.js";
+import DropDownPicker from "react-native-dropdown-picker";
+import Shopping from "../assets/svg/shopping.js";
+import { useNavigation } from "expo-router";
 
 const Order = () => {
-  const bottomSheetRef1 = useRef(null);
-  const bottomSheetRef2 = useRef(null);
-  const snapPoints = React.useMemo(() => ["45%"], []);
+  const [arrowModalVisible, setArrowModalVisible] = useState(false); // Modal visibility state for arrow
+  const [quantity, setQuantity] = useState(10);
+  const pricePerUnit = 245;
 
-  const openDetailsSheet = () => {
-    if (bottomSheetRef1.current) {
-      bottomSheetRef1.current.expand();
-    }
+  const handleIncrease = () => setQuantity(quantity + 1);
+  const handleDecrease = () => {
+    if (quantity > 1) setQuantity(quantity - 1);
   };
 
-  const openFilterSheet = () => {
-    if (bottomSheetRef2.current) {
-      bottomSheetRef2.current.expand();
-    }
+  const totalPrice = (pricePerUnit * quantity).toFixed(2);
+
+  const navigation = useNavigation(); // Hook to access navigation
+
+  const handleAddToCart = () => {
+    navigation.navigate("Addtocart");
   };
 
-  // Snap points for the bottom sheet
   const dashboardData = [
     { id: "1", icon: "user", title: "Total Customers", value: "5,523" },
     { id: "2", icon: "users", title: "Members", value: "5,600" },
@@ -48,15 +47,26 @@ const Order = () => {
     { id: "6", icon: "lock", title: "Products", value: "15,240" },
   ];
 
-  const [quantity, setQuantity] = useState(10);
-  const pricePerUnit = 245; // Example price per unit
+  // Category Dropdown State
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentValue, setCurrentValue] = useState();
+  const items = [
+    { label: "Laminate", value: "laminate" },
+    { label: "Wall Panel", value: "wall panel" },
+    { label: "Both Side Laminate", value: "both side laminate" },
+    { label: "Uv Panel", value: "uv panel" },
+  ];
 
-  const handleIncrease = () => setQuantity(quantity + 1);
-  const handleDecrease = () => {
-    if (quantity > 1) setQuantity(quantity - 1);
-  };
+  // Subcategory Dropdown State
+  const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
 
-  const totalPrice = (pricePerUnit * quantity).toFixed(2);
+  // Subcategories Data
+  const subcategories = [
+    { label: "Wall Panel", value: "wall panel" },
+    { label: "Bothe Side Uv", value: "both side uv" },
+    { label: "Laminate", value: "laminate" },
+  ];
 
   const renderCard = ({ item }) => (
     <View style={styles.card}>
@@ -64,251 +74,298 @@ const Order = () => {
         source={{
           uri: "https://i0.wp.com/blog.wishkarma.com/wp-content/uploads/2022/06/Frame-519-1.png?fit=1920%2C1080&ssl=1",
         }}
-        style={styles.one}
+        style={styles.productImage}
       />
-
-      <View style={styles.two}>
-        <Text style={styles.t1}>9 GL LAMINATE</Text>
-        <Text numberOfLines={2} ellipsizeMode="tail" style={styles.t2}>
+      <View style={styles.productDetails}>
+        <Text style={styles.productTitle}>9 GL LAMINATE</Text>
+        <Text
+          numberOfLines={2}
+          ellipsizeMode="tail"
+          style={styles.productDescription}
+        >
           lorem ipsum js skdhuduwd skadhugsdku skadhugsdku skadhugsdku{" "}
         </Text>
-        <View style={styles.t3}>
-          <Text style={styles.t1}>₹ 245</Text>
-          <Text style={styles.t1}>Qty 200</Text>
+        <View style={styles.productPriceQty}>
+          <Text style={styles.productPrice}>Qty 200</Text>
+          {/* <Text style={styles.productQuantity}>Qty 200</Text> */}
         </View>
       </View>
-      <Pressable style={styles.three} onPress={openDetailsSheet}>
+      <Pressable
+        style={styles.moreDetailsButton}
+        onPress={() => setArrowModalVisible(true)}
+      >
         <Entypo name="chevron-right" size={22} color="#fff" />
       </Pressable>
     </View>
   );
-  const renderBackdrop = (props) => (
-    <BottomSheetBackdrop
-      {...props}
-      disappearsOnIndex={-1} // Backdrop disappears when BottomSheet is closed
-      appearsOnIndex={0} // Backdrop appears when BottomSheet is open
-      opacity={0.7} // Set opacity for the backdrop
-    />
-  );
+
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleFilterButtonPress = () => {
+    setLoading(true);
+
+    // Simulate a loading delay (e.g., 2 seconds)
+    setTimeout(() => {
+      setLoading(false);
+      setFilterModalVisible(true); // Open the modal after loading
+    }, 2000); // Adjust the delay as needed
+  };
 
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       {/* Search Bar */}
-      <View style={{ flex: 1 }}>
-        <View style={styles.searchContainer}>
-          <AntDesign
-            name="search1"
-            size={20}
-            color="#888"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            placeholder="Search..."
-            style={styles.searchInput}
-            placeholderTextColor="#888"
-          />
-          <Pressable style={styles.filter} onPress={openFilterSheet}>
-            <Setting
-              style={{ width: 50, height: 50 }} // Example to set the size of the icon
-              color="#fff" // Dynamically change color based on 'focused' state
-            />
-          </Pressable>
-        </View>
-        <Text style={styles.product}>Products</Text>
-
-        <FlatList data={dashboardData} renderItem={renderCard}></FlatList>
+      <View style={styles.searchContainer}>
+        <AntDesign
+          name="search1"
+          size={20}
+          color="#888"
+          style={styles.searchIcon}
+        />
+        <TextInput
+          placeholder="Search..."
+          style={styles.searchInput}
+          placeholderTextColor="#888"
+        />
+     <Pressable style={styles.filterButton} onPress={handleFilterButtonPress}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#fff"  style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />
+        ) : (
+          <Setting style={{ width: 50, height: 50 }} color="#fff" />
+        )}
+      </Pressable>
       </View>
-      {/* arrow product openDetailsSheet bottomsheet */}
-      <BottomSheet
-        backdropComponent={renderBackdrop}
-        ref={bottomSheetRef1}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose={true}
+
+      <Text style={styles.productTitleText}>Products</Text>
+
+      <FlatList
+        data={dashboardData}
+        renderItem={renderCard}
+        keyExtractor={(item) => item.id}
+      />
+
+      {/* Filter Modal */}
+      <Modal
+        visible={filterModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setFilterModalVisible(false)}
       >
-        <View style={styles.container}>
-          {/* Product Name and Availability */}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <View>
-              <Text style={styles.productName}>9 GL LAMINATE </Text>
-            </View>
-            <View style={styles.availabilityContainer}>
-              <Text style={styles.availabilityText}>Available in stock</Text>
-            </View>
-          </View>
-
-          {/* Product Description */}
-          <Text
-            numberOfLines={3}
-            ellipsizeMode="tail"
-            style={styles.description}
-          >
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s ...
-          </Text>
-
-          {/* Quantity and Selector */}
-          <View style={styles.quantityContainer}>
-            <View style={{ width: 100 }}>
-              <Text
-                style={{ fontFamily: "pr", fontSize: 12, color: "#666666" }}
-              >
-                Quantity
-              </Text>
-              <Text
-                style={{ fontFamily: "psb", fontSize: 16, color: "#181C2E" }}
-              >
-                200
-              </Text>
-            </View>
-            <View style={styles.quantitySelector}>
-              <TouchableOpacity
-                onPress={handleDecrease}
-                style={styles.selectorButton}
-              >
-                <Text style={styles.selectorText}>-</Text>
-              </TouchableOpacity>
-              <TextInput
-                editable={false}
-                style={styles.input}
-                keyboardType="numeric"
-                value={quantity.toString()}
-                onChangeText={(value) => setQuantity(Number(value) || 1)}
+        <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)}>
+          <View style={styles.modalBackdrop}></View>
+        </TouchableWithoutFeedback>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.modalContainer}
+        >
+          <View style={styles.modalContent}>
+            {/* Category Dropdown */}
+            <Text style={styles.Category}>Category</Text>
+            <View style={{ height: "auto", width: "100%", borderRadius: 13 }}>
+              <DropDownPicker
+                items={items}
+                open={isOpen}
+                setOpen={setIsOpen}
+                value={currentValue}
+                setValue={setCurrentValue}
+                maxHeight={100}
+                autoScroll
+                placeholder="Select Your Category"
+                placeholderStyle={{
+                  color: "gray",
+                  fontFamily: "psb",
+                  fontSize: 14,
+                }}
+                style={styles.dropdownStyle}
+                zIndex={2000} // Slightly lower than Category Dropdown
               />
+            </View>
+
+            {/* Subcategory Dropdown */}
+            <Text style={styles.Subcategory}>Sub Category</Text>
+            <View style={{ height: "auto", width: "100%", borderRadius: 13 }}>
+              <DropDownPicker
+                items={subcategories}
+                open={isSubCategoryOpen}
+                setOpen={setIsSubCategoryOpen}
+                value={selectedSubCategory}
+                setValue={setSelectedSubCategory}
+                maxHeight={100}
+                autoScroll
+                placeholder="Select Your Subcategory"
+                placeholderStyle={{
+                  color: "gray",
+                  fontFamily: "psb",
+                  fontSize: 14,
+                }}
+                style={styles.dropdownStyle}
+                zIndex={1000} // Ensure this is higher than other elements
+              />
+            </View>
+
+            {/* Submit Button */}
+            <View style={{ alignItems: "center" }}>
               <TouchableOpacity
-                onPress={handleIncrease}
-                style={styles.selectorButton}
+                style={styles.submitButton}
+                onPress={() => {
+                  // Log the selected values
+                  console.log("Selected Category:", currentValue);
+                  console.log("Selected Subcategory:", selectedSubCategory);
+
+                  // Reset values
+                  setCurrentValue(null);
+                  setSelectedSubCategory(null);
+
+                  // Close the modal
+                  setFilterModalVisible(false);
+                }}
               >
-                <Text style={styles.selectorText}>+</Text>
+                <Text style={styles.submitButtonText}>Submit</Text>
               </TouchableOpacity>
             </View>
           </View>
+        </KeyboardAvoidingView>
+      </Modal>
 
-          {/* Total Price */}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              marginTop: 10,
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <View style={styles.priceContainer}>
-              <Text
-                style={{ fontFamily: "pr", fontSize: 12, color: "#666666" }}
-              >
-                Total Price
-              </Text>
-              <Text style={styles.price}>₹ {totalPrice}</Text>
-            </View>
-
-            {/* Add to Cart Button */}
-            <TouchableOpacity style={styles.addToCartButton}>
-              <Text style={styles.addToCartText}>Add to cart</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </BottomSheet>
-
-      {/* openFilterSheet bottomsheet */}
-      <BottomSheet
-        backdropComponent={renderBackdrop}
-        ref={bottomSheetRef2}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose={true}
+      {/* Arrow Modal */}
+      <Modal
+        visible={arrowModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setArrowModalVisible(false)}
       >
-        <View style={styles.container}>
-          {/* Product Name and Availability */}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <View>
-              <Text style={styles.productName}>9 GL LAMINATE </Text>
+        <TouchableWithoutFeedback onPress={() => setArrowModalVisible(false)}>
+          <View style={styles.modalBackdrop}></View>
+        </TouchableWithoutFeedback>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.modalContainer}
+        >
+          <View style={styles.container}>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                width: "100%",
+                height: "auto",
+              }}
+            >
+              <View>
+                <Text style={styles.productName}>9 GL LAMINATE </Text>
+              </View>
+              {/* <View style={styles.availabilityContainer}>
+                <Text style={styles.availabilityText}>Available in stock</Text>
+              </View> */}
             </View>
-            <View style={styles.availabilityContainer}>
-              <Text style={styles.availabilityText}>Available in stock</Text>
+
+            {/* Product Description */}
+            <Text ellipsizeMode="tail" style={styles.description}>
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever since the 1500s ... Lorem Ipsum is simply dummy text of the
+              printing and typesetting industry. Lorem Ipsum has been the
+              industry's standard dummy text ever since the 1500s ... Lorem
+              Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever since the 1500s ... Lorem Ipsum is simply dummy text of the
+              printing and typesetting industry. Lorem Ipsum has been the
+              industry's standard dummy text ever since the 1500s ...
+            </Text>
+
+            {/* Quantity and Selector */}
+            <View style={styles.quantityContainer}>
+              <View style={{ width: 100 }}>
+                <Text
+                  style={{
+                    fontFamily: "psb",
+                    fontSize: 12,
+                    color: "#fff",
+                    backgroundColor: "#02BC49",
+                    borderRadius: 10,
+                    padding: 2,
+                    textAlign: "center",
+                  }}
+                >
+                  Qty (In Stock)
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "psb",
+                    fontSize: 18,
+                    color: "#181C2E",
+                    marginLeft: 6,
+                  }}
+                >
+                  200
+                </Text>
+              </View>
+              <View style={styles.quantitySelector}>
+                <TouchableOpacity
+                  onPress={handleDecrease}
+                  style={styles.selectorButton}
+                >
+                  <Text style={styles.selectorText}>-</Text>
+                </TouchableOpacity>
+                <TextInput
+                  editable={false}
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={quantity.toString()}
+                  onChangeText={(value) => setQuantity(Number(value) || 1)}
+                />
+                <TouchableOpacity
+                  onPress={handleIncrease}
+                  style={styles.selectorButton}
+                >
+                  <Text style={styles.selectorText}>+</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Total Price */}
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                marginTop: 10,
+                justifyContent: "center",
+                // width: "100%",
+              }}
+            >
+              {/* <View style={styles.priceContainer}>
+                <Text
+                  style={{ fontFamily: "pr", fontSize: 12, color: "#666666" }}
+                >
+                  Total Price
+                </Text>
+                <Text style={styles.price}>₹ {totalPrice}</Text>
+              </View> */}
+
+              {/* Add to Cart Button */}
+              <TouchableOpacity
+                style={styles.addToCartButton}
+                onPress={handleAddToCart}
+              >
+                <View style={styles.iconTextWrapper}>
+                  <Shopping style={styles.shoppingIcon} />
+                  <Text style={styles.addToCartText}>Add to cart</Text>
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
-
-          {/* Product Description */}
-          <Text
-            numberOfLines={3}
-            ellipsizeMode="tail"
-            style={styles.description}
-          >
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s ...
-          </Text>
-
-          {/* Quantity and Selector */}
-          <View style={styles.quantityContainer}>
-            <View style={{ width: 100 }}>
-              <Text
-                style={{ fontFamily: "pr", fontSize: 12, color: "#666666" }}
-              >
-                Quantity
-              </Text>
-              <Text
-                style={{ fontFamily: "psb", fontSize: 16, color: "#181C2E" }}
-              >
-                200
-              </Text>
-            </View>
-          </View>
-
-          {/* Total Price */}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              marginTop: 10,
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <View style={styles.priceContainer}>
-              <Text
-                style={{ fontFamily: "pr", fontSize: 12, color: "#666666" }}
-              >
-                Total Price 1223345
-              </Text>
-              <Text style={styles.price}>₹ {totalPrice}</Text>
-            </View>
-
-            {/* Add to Cart Button */}
-            <TouchableOpacity style={styles.addToCartButton}>
-              <Text style={styles.addToCartText}>Add to cart</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </BottomSheet>
-    </GestureHandlerRootView>
+        </KeyboardAvoidingView>
+      </Modal>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 20,
+    backgroundColor: "#ffffff",
+    // padding: 20,
     zIndex: 10,
-    // height : "100%"
   },
   searchContainer: {
     flexDirection: "row",
@@ -320,12 +377,12 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    width: "85%",
-    // flex  :1,
-    // elevation: 2,
-    // width : 100,
+    width: "72%",
     borderRadius: 30,
     borderWidth: 0,
+    marginRight: 20,
+    marginLeft: 20,
+    marginTop: 20,
   },
   searchIcon: {
     marginRight: 10,
@@ -338,122 +395,91 @@ const styles = StyleSheet.create({
     width: "100%",
     borderColor: "#fff",
   },
-  welcomeContainer: {
-    marginBottom: 20,
+  filterButton: {
+    width: 45,
+    height: 45,
+    backgroundColor: "#F58731",
+    borderRadius: 50,
+    right: "-26%",
   },
-  welcomeText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
+  filterIcon: {
+    width: 24,
+    height: 24,
   },
-  appName: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#f78c1f",
-  },
-  dashboardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 10,
-  },
-  dashboardContainer: {
-    paddingBottom: 20,
+  productTitleText: {
+    marginVertical: 5,
+    fontFamily: "pb",
+    fontSize: 15,
+    color: "#181C2E",
+    marginRight: 20,
+    marginLeft: 20,
   },
   card: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "red",
-    padding: 15,
-    marginBottom: 15,
-    // shadowOpacity: 10,
-    // shadowRadius: 20,
+    padding: 10,
+    marginBottom: 10,
+    marginTop: 10,
     elevation: 1,
     borderRadius: 20,
-    // overflow:"hidden",
-    // borderWidth : 1,
     backgroundColor: "#f8f8f8",
-    //    backgroundColor : "red",
-
-    // shadowOffset: { width: 0, height: 10 },
-    height: 100,
+    shadowColor: "rgba(0,0,0,0.5)",
+    shadowOpacity: 10,
+    shadowRadius: 20,
+    elevation: 10,
+    shadowOffset: { width: 0, height: 10 },
+    // height: 100,
     display: "flex",
     flexDirection: "row",
+    marginRight: 20,
+    marginLeft: 20,
   },
-  cardIcon: {
+
+  productImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 12,
     marginRight: 15,
   },
-  cardValue: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
+  productDetails: {
+    flex: 1,
   },
-  cardTitle: {
-    fontSize: 14,
-    color: "#888",
-  },
-
-  navItem: {
-    alignItems: "center",
-  },
-
-  i: {
-    margin: "auto",
-  },
-  filter: {
-    width: 45,
-    height: 45,
-    backgroundColor: "orange",
-    borderRadius: 50,
-    right: "-26%",
-  },
-
-  product: {
-    marginVertical: 10,
-    fontFamily: "pb",
-    fontSize: 15,
-    color: "#181C2E",
-  },
-  one: {
-    width: "25%",
-    height: "100%",
-    aspectRatio: 1 / 1,
-    borderRadius: 12,
-    //   backgroundColor : "red",
-    marginLeft: -5,
-  },
-
-  two: {
-    width: "60%",
-    // height  : "100%",
-    padding: 12,
-  },
-
-  t1: {
+  productTitle: {
     fontFamily: "psb",
     fontSize: 14,
     color: "#181C2E",
   },
-  t2: {
+  productDescription: {
     fontFamily: "pr",
     fontSize: 11,
     color: "#666666",
     width: "100%",
     marginBottom: 5,
   },
-  t3: {
+  productPriceQty: {
     display: "flex",
     width: "100%",
     justifyContent: "space-between",
     flexDirection: "row",
     alignItems: "flex-start",
   },
-  three: {
+  productPrice: {
+    fontFamily: "psb",
+    fontSize: 14,
+    color: "#181C2E",
+  },
+  productQuantity: {
+    fontFamily: "psb",
+    fontSize: 14,
+    color: "#181C2E",
+  },
+  moreDetailsButton: {
     marginLeft: 20,
     width: 30,
     height: 30,
     right: 0,
-    backgroundColor: "orange",
+    backgroundColor: "#F58731",
     borderRadius: 10,
     display: "flex",
     justifyContent: "center",
@@ -461,11 +487,29 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingLeft: 3,
   },
-  container: {
+
+  modalBackdrop: {
     flex: 1,
-    backgroundColor: "#F7F8FA",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    // flex: 0.8,
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+  },
+
+  modalContent: {
+    flex: 1,
+    backgroundColor: "#fff",
     padding: 20,
   },
+
+  dropdownContainer: {
+    zIndex: 1000,
+    marginBottom: 20,
+  },
+
   productName: {
     fontSize: 18,
     fontWeight: "bold",
@@ -473,6 +517,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "left",
     fontFamily: "psb",
+    marginRight: 20,
+    marginLeft: 20,
+    marginTop: 20,
   },
   availabilityContainer: {
     alignSelf: "flex-start",
@@ -497,12 +544,17 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 20,
     fontFamily: "pr",
+    marginRight: 20,
+    marginLeft: 20,
+    justifyContent: "space-evenly",
   },
   quantityContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: 0,
+    marginRight: 20,
+    marginLeft: 20,
   },
   label: {
     fontSize: 14,
@@ -517,7 +569,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: 100,
     height: 35,
-
+    marginBottom: 22,
     overflow: "hidden",
     fontFamily: "pr",
     backgroundColor: "#f8f8f8",
@@ -545,9 +597,6 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   priceContainer: {
-    // flexDirection: 'row',
-    // justifyContent: 'space-between',
-    // alignItems: 'center',
     marginBottom: 20,
   },
   price: {
@@ -556,21 +605,68 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   addToCartButton: {
-    backgroundColor: "orange",
+    backgroundColor: "#F58731",
     borderRadius: 10,
-    // paddingVertical: 12,
-    width: 170,
-    height: 36,
-    marginTop: 2,
+    width: "50%",
+    // height: 40,
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 20,
+    marginLeft: 20,
+    marginBottom: 20,
+  },
+
+  iconTextWrapper: {
+    flexDirection: "row",
     alignItems: "center",
   },
+
+  shoppingIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 8,
+  },
+
   addToCartText: {
     color: "#FFF",
-    fontSize: 16,
-    // fontWeight: 'bold',
-    paddingTop: 6,
+    fontSize: 17,
     fontFamily: "psb",
     textAlign: "center",
+  },
+
+  Category: {
+    fontFamily: "psb",
+    fontSize: 18,
+    color: "#181C2E",
+    marginBottom: 10,
+    marginTop: 5,
+  },
+  Subcategory: {
+    fontFamily: "psb",
+    fontSize: 18,
+    color: "#181C2E",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  submitButton: {
+    marginTop: 20,
+    backgroundColor: "#F58731",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    width: 170,
+  },
+  submitButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontFamily: "pb",
+  },
+  dropdownStyle: {
+    borderRadius: 13,
+    borderColor: "#ccc",
+    borderWidth: 1,
   },
 });
 

@@ -7,6 +7,7 @@ import {
   FlatList,
   Pressable,
   Image,
+  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
 import {
@@ -14,6 +15,7 @@ import {
   FontAwesome5,
   Ionicons,
   MaterialIcons,
+
 } from "@expo/vector-icons";
 // import Home from "../assets/svg/home.js"
 import Entypo from "@expo/vector-icons/Entypo";
@@ -23,22 +25,41 @@ import Setting from "../assets/svg/setting.js";
 import Delete from "../assets/svg/delete.js";
 import Checkout from "../assets/svg/proceed.js";
 import { useNavigation } from "@react-navigation/native";
+import DropDownPicker from "react-native-dropdown-picker";
+import Leftarrow from "../assets/svg/leftarrow.js";
 
 const Addtocart = () => {
   const navigation = useNavigation(); // Initialize the navigation hook
 
+  const [isLoading, setIsLoading] = useState(false); // Loader state
+
   const handleProceedToCheckout = () => {
-    navigation.navigate("SuccessPage"); // Navigate to "Screen4" when the button is clicked
+    if (!currentValue) {
+      alert("Please select a customer before proceeding to checkout.");
+      return;
+    }
+
+    setIsLoading(true); // Show loader
+
+    // Simulating a network request or any async operation
+    setTimeout(() => {
+      setIsLoading(false); // Hide loader after some time (simulating navigation delay)
+      navigation.navigate("SuccessPage"); // Navigate to the success page
+    }, 2000); // Simulated delay (adjust as necessary)
   };
+
   const bottomSheetRef = useRef(null);
   const snapPoints = React.useMemo(() => ["45%"], []);
-  const open1 = () => {
-    console.log("hi");
 
-    if (bottomSheetRef.current) {
-      bottomSheetRef.current.expand(); // Ensure ref is not null
-    }
-  };
+  // Category Dropdown State
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentValue, setCurrentValue] = useState();
+  const items = [
+    { label: "Ajay", value: "ajay" },
+    { label: "Sujay", value: "sujay" },
+    { label: "Nikita", value: "nikita" },
+    { label: "Akshay", value: "akshay" },
+  ];
 
   // Snap points for the bottom sheet
   const dashboardData = [
@@ -62,69 +83,80 @@ const Addtocart = () => {
 
   const renderCard = ({ item }) => (
     <View style={styles.card}>
-      <Image
-        source={{
-          uri: "https://i0.wp.com/blog.wishkarma.com/wp-content/uploads/2022/06/Frame-519-1.png?fit=1920%2C1080&ssl=1",
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          border: "1px solid #cccccc",
+          width: "100%",
+          alignItems: "center",
         }}
-        style={styles.one}
-      />
-
-      <View style={styles.two}>
-        <View style={styles.t3}>
-          <Text style={styles.t1}>9 GL LAMINATE</Text>
-
-          <Delete
-            style={{
-              width: 25,
-              height: 25,
-              marginTop: 5,
-              marginLeft: 50, // Pushes the icon to the far-right
-              color: "#181C2E",
+      >
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            border: "1px solid #cccccc",
+          }}
+        >
+          <Image
+            source={{
+              uri: "https://i0.wp.com/blog.wishkarma.com/wp-content/uploads/2022/06/Frame-519-1.png?fit=1920%2C1080&ssl=1",
             }}
+            style={styles.one}
           />
         </View>
-
-        {/* <Text numberOfLines={2} ellipsizeMode="tail" style={styles.t2}>
-        Price (₹) 245
-        </Text> */}
-        <View style={styles.t3}>
-          <Text style={styles.t2}>
-            Price(₹){" "}
-            <Text style={{ fontFamily: "psb", fontSize: 12, color: "#181C2E" }}>
-              245.00
-            </Text>
-          </Text>
+        <View style={{ display: "flex", flexDirection: "column" }}>
+          <Text style={styles.t1}>9 GL LAMINATE</Text>
           <Text style={styles.t2}>
             Quantity{" "}
             <Text style={{ fontFamily: "psb", fontSize: 12, color: "#181C2E" }}>
               200
             </Text>
           </Text>
+          <View style={styles.quantitySelector}>
+            <TouchableOpacity
+              onPress={handleDecrease}
+              style={styles.selectorButton}
+            >
+              <Text style={styles.selectorText}>-</Text>
+            </TouchableOpacity>
+            <TextInput
+              editable={false}
+              style={styles.input}
+              keyboardType="numeric"
+              value={quantity.toString()}
+              onChangeText={(value) => setQuantity(Number(value) || 1)}
+            />
+            <TouchableOpacity
+              onPress={handleIncrease}
+              style={styles.selectorButton}
+            >
+              <Text style={styles.selectorText}>+</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.quantitySelector}>
-          <TouchableOpacity
-            onPress={handleDecrease}
-            style={styles.selectorButton}
-          >
-            <Text style={styles.selectorText}>-</Text>
-          </TouchableOpacity>
-          <TextInput
-            editable={false}
-            style={styles.input}
-            keyboardType="numeric"
-            value={quantity.toString()}
-            onChangeText={(value) => setQuantity(Number(value) || 1)}
+        <View
+          style={{
+            border: "1px solid #000",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Delete
+            style={{
+              width: 25,
+              height: 25,
+              color: "#181C2E",
+            }}
           />
-          <TouchableOpacity
-            onPress={handleIncrease}
-            style={styles.selectorButton}
-          >
-            <Text style={styles.selectorText}>+</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </View>
   );
+
   const renderBackdrop = (props) => (
     <BottomSheetBackdrop
       {...props}
@@ -136,26 +168,27 @@ const Addtocart = () => {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      {/* Search Bar */}
       <View style={{ flex: 1 }}>
-        <View style={styles.searchContainer}>
-          <AntDesign
-            name="search1"
-            size={20}
-            color="#888"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            placeholder="Search..."
-            style={styles.searchInput}
-            placeholderTextColor="#888"
-          />
-          <Pressable style={styles.filter} onPress={open1}>
-            <Setting
-              style={{ width: 50, height: 50 }} // Example to set the size of the icon
-              color="#fff" // Dynamically change color based on 'focused' state
+        <View style={styles.topBar}>
+          {/* SVG Icon (20% width) */}
+          <View style={styles.iconContainer}>
+            <Leftarrow width={18} height={12} />
+          </View>
+          {/* Dropdown (80% width) */}
+          <View style={styles.dropdownContainer}>
+            <DropDownPicker
+              items={items}
+              open={isOpen}
+              setOpen={setIsOpen}
+              value={currentValue}
+              setValue={setCurrentValue}
+              maxHeight={100}
+              autoScroll
+              placeholder="Select Customer"
+              placeholderStyle={styles.placeholderStyle}
+              style={styles.dropdownStyle}
             />
-          </Pressable>
+          </View>
         </View>
         <Text style={styles.product}>My Cart</Text>
 
@@ -163,14 +196,12 @@ const Addtocart = () => {
 
         <View
           style={{
-            paddingVertical: 14,
-            backgroundColor: "#fff",
-            // borderTopLeftRadius: 20,
-            // borderTopRightRadius: 20,
-            paddingHorizontal: 15,
+            backgroundColor: "#ffffff",
+            // paddingHorizontal: 15,
             shadowColor: "#000",
             shadowOpacity: 0.1,
             shadowRadius: 5,
+            paddingTop: 15,
           }}
         >
           {/* Total Section */}
@@ -179,154 +210,58 @@ const Addtocart = () => {
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: 15,
             }}
           >
             <Text style={{ fontFamily: "psb", fontSize: 14, color: "#888" }}>
-              Total (3 items):
+              Total (Quantity):
             </Text>
             <Text style={{ fontFamily: "psb", fontSize: 16, color: "#181C2E" }}>
-              ₹ 735
+              140
             </Text>
           </View>
 
           {/* Proceed to Checkout Button */}
           <TouchableOpacity
-            onPress={handleProceedToCheckout} // Add this handler to the button
+            onPress={handleProceedToCheckout}
             style={{
-              backgroundColor: "orange",
+              backgroundColor: "#F58731",
               borderRadius: 10,
               alignItems: "center",
               paddingVertical: 10,
-              flexDirection: "row", // Align text and icon horizontally
-              justifyContent: "center", // Center the content horizontally
+              flexDirection: "row",
+              justifyContent: "center",
+              marginTop: 10,
             }}
           >
-            <Text style={{ fontFamily: "psb", fontSize: 16, color: "#fff" }}>
-              Proceed to Checkout
-            </Text>
+            {isLoading ? (
+              // Display loader if isLoading is true
+              <ActivityIndicator style={styles.loaderContainer} size="small" color="#fff" />
+            ) : (
+              <>
+                <Text
+                  style={{ fontFamily: "psb", fontSize: 16, color: "#fff" }}
+                >
+                  Proceed to Checkout
+                </Text>
 
-            <Checkout
-              style={{
-                width: 30, // Set the size of the icon
-                height: 30, // Ensure it fits well with the text
-                marginLeft: 60, // Space between the icon and text
-                color: "#fff", // Icon color (white)
-              }}
-            />
+                <Checkout
+                  style={{
+                    width: 30,
+                    height: 30,
+                    marginLeft: 60,
+                    color: "#fff",
+                  }}
+                />
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </View>
-
-      <BottomSheet
-        backdropComponent={renderBackdrop}
-        ref={bottomSheetRef}
-        index={-1} // Start closed
-        snapPoints={snapPoints}
-        enablePanDownToClose={true} // Allows swiping down to close
-      >
-        <View style={styles.container}>
-          {/* Product Name and Availability */}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <View>
-              <Text style={styles.productName}>9 GL LAMINATE</Text>
-            </View>
-            <View style={styles.availabilityContainer}>
-              <Text style={styles.availabilityText}>Available in stock</Text>
-            </View>
-          </View>
-
-          {/* Product Description */}
-          <Text
-            numberOfLines={3}
-            ellipsizeMode="tail"
-            style={styles.description}
-          >
-            Price (₹) 245
-          </Text>
-
-          {/* Quantity and Selector */}
-          <View style={styles.quantityContainer}>
-            <View style={{ width: 100 }}>
-              <Text
-                style={{ fontFamily: "pr", fontSize: 12, color: "#666666" }}
-              >
-                Quantity
-              </Text>
-              <Text
-                style={{ fontFamily: "psb", fontSize: 16, color: "#181C2E" }}
-              >
-                200
-              </Text>
-            </View>
-            <View style={styles.quantitySelector}>
-              <TouchableOpacity
-                onPress={handleDecrease}
-                style={styles.selectorButton}
-              >
-                <Text style={styles.selectorText}>-</Text>
-              </TouchableOpacity>
-              <TextInput
-                editable={false}
-                style={styles.input}
-                keyboardType="numeric"
-                value={quantity.toString()}
-                onChangeText={(value) => setQuantity(Number(value) || 1)}
-              />
-              <TouchableOpacity
-                onPress={handleIncrease}
-                style={styles.selectorButton}
-              >
-                <Text style={styles.selectorText}>+</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Total Price */}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              marginTop: 10,
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <View style={styles.priceContainer}>
-              <Text
-                style={{ fontFamily: "pr", fontSize: 12, color: "#666666" }}
-              >
-                Total Price
-              </Text>
-              <Text style={styles.price}>₹ {totalPrice}</Text>
-            </View>
-
-            {/* Add to Cart Button */}
-            <TouchableOpacity style={styles.addToCartButton}>
-              <Text style={styles.addToCartText}>Add to cart</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </BottomSheet>
     </GestureHandlerRootView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 20,
-    zIndex: 10,
-    // height : "100%"
-  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -338,9 +273,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     width: "85%",
-    // flex  :1,
-    // elevation: 2,
-    // width : 100,
     borderRadius: 30,
     borderWidth: 0,
   },
@@ -380,7 +312,6 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "red",
     padding: 15,
     marginBottom: 15,
     // shadowOpacity: 10,
@@ -420,7 +351,7 @@ const styles = StyleSheet.create({
   filter: {
     width: 45,
     height: 45,
-    backgroundColor: "orange",
+    backgroundColor: "#F58731",
     borderRadius: 50,
     right: "-26%",
   },
@@ -432,12 +363,9 @@ const styles = StyleSheet.create({
     color: "#181C2E",
   },
   one: {
-    width: "25%",
     height: "100%",
     aspectRatio: 1 / 1,
     borderRadius: 12,
-    //   backgroundColor : "red",
-    marginLeft: -5,
   },
 
   two: {
@@ -470,7 +398,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     right: 0,
-    backgroundColor: "orange",
+    backgroundColor: "#F58731",
     borderRadius: 10,
     display: "flex",
     justifyContent: "center",
@@ -480,7 +408,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#F7F8FA",
+    backgroundColor: "#ffffff",
     padding: 20,
   },
   productName: {
@@ -562,9 +490,6 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   priceContainer: {
-    // flexDirection: 'row',
-    // justifyContent: 'space-between',
-    // alignItems: 'center',
     marginBottom: 20,
   },
   price: {
@@ -573,7 +498,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   addToCartButton: {
-    backgroundColor: "orange",
+    backgroundColor: "#F58731",
     borderRadius: 10,
 
     width: 170,
@@ -588,6 +513,46 @@ const styles = StyleSheet.create({
     paddingTop: 6,
     fontFamily: "psb",
     textAlign: "center",
+  },
+
+  // topbar-icon
+
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    paddingHorizontal: 10,
+    height: 50,
+    marginBottom: 10,
+    marginTop: 10,
+  },
+  dropdownContainer: {
+    width: "80%",
+  },
+  placeholderStyle: {
+    color: "gray",
+    fontFamily: "psb",
+    fontSize: 14,
+  },
+  dropdownStyle: {
+    borderRadius: 13,
+    borderColor: "#ccc",
+    borderWidth: 1,
+  },
+  iconContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F58731",
+    borderRadius: 20,
+    width: "20%",
+    width: 40,
+    height: 40,
+    marginRight: 20,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

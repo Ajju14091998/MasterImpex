@@ -39,7 +39,7 @@ const Main1 = ({ navigation }) => {
 
   function handlelogin() {}
   return (
-    <KeyboardAvoidingView style={{ flex: 1.2 }}>
+    <KeyboardAvoidingView style={{ flex: 1.2, backgroundColor:"#ffffff", }}>
       {/* <NavigationContainer independent={true}> */}
       <Tab.Navigator
         tabBarOptions={{
@@ -47,6 +47,10 @@ const Main1 = ({ navigation }) => {
           style: {
             position: "absolute",
             bottom: 0,
+            backgroundColor:"#ffffff",
+         
+          
+         
           },
         }}
         initialRouteName="Home"
@@ -56,7 +60,7 @@ const Main1 = ({ navigation }) => {
           headerShown: false,
 
           tabBarStyle: {
-            backgroundColor: "#fff",
+            backgroundColor: "#ffffff",
             height: 60,
             paddingHorizontal: 20,
             borderTopLeftRadius: 25,
@@ -65,9 +69,12 @@ const Main1 = ({ navigation }) => {
             zIndex: 0,
             opacity: 1,
             paddingTop: 10,
+            marginTop:10,
             position: "relative",
-            bottom: 0,
-            // transform :[{translateY : bottomposition}]
+            borderBottomWidth: 0,
+            borderWidth: 1,
+            borderStyle: "solid",
+            bordecolor: "#EEEEEE",
           },
         }}
       >
@@ -98,8 +105,8 @@ const Main1 = ({ navigation }) => {
               <View style={focused ? styles.iconc : styles.iconc1}>
                 <View style={focused ? styles.box : styles.box1}>
                   <Cart
-                    style={{ width: 20, height: 20, paddingLeft: 10 }} // Example to set the size of the icon
-                    color={focused ? "#fff" : "#000"} // Dynamically change color based on 'focused' state
+                    style={{ width: 20, height: 20, paddingLeft: 10 }}
+                    color={focused ? "#fff" : "#000"}
                   />
                 </View>
                 {focused && <Text style={styles.navText}>Order</Text>}
@@ -117,8 +124,8 @@ const Main1 = ({ navigation }) => {
               <View style={focused ? styles.iconc : styles.iconc1}>
                 <View style={focused ? styles.box : styles.box1}>
                   <Cart1
-                    style={{ width: 20, height: 20, paddingLeft: 10 }} // Set the size of the icon
-                    color={focused ? "#fff" : "#000"} // Dynamically change the color based on the `focused` state
+                    style={{ width: 20, height: 20, paddingLeft: 10 }}
+                    color={focused ? "#fff" : "#000"}
                   />
                 </View>
                 {focused && <Text style={styles.navText}>Cart</Text>}
@@ -136,8 +143,8 @@ const Main1 = ({ navigation }) => {
               <View style={focused ? styles.iconc : styles.iconc1}>
                 <View style={focused ? styles.box : styles.box1}>
                   <Profile
-                    style={{ width: 20, height: 20, paddingLeft: 10 }} // Set the size of the icon
-                    color={focused ? "#fff" : "#000"} // Dynamically change the color based on the `focused` state
+                    style={{ width: 20, height: 20, paddingLeft: 10 }}
+                    color={focused ? "#fff" : "#000"}
                   />
                 </View>
                 {focused && <Text style={styles.navText}>Profile</Text>}
@@ -167,17 +174,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#EEEEEE",
     display: "flex",
     flexDirection: "row",
-    // justifyContent : "space-around"
   },
   iconc1: {
     width: 50,
     height: 40,
     borderRadius: 30,
-    // backgroundColor : "#EEEEEE",
     display: "flex",
     flexDirection: "row",
     marginHorizontal: 10,
-    // justifyContent : "space-around"
   },
   box: {
     width: 40,

@@ -1,14 +1,24 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Succesful from '../assets/svg/Succesful'; // Adjust the path to your icon
 
 export default function SuccessPage() {
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const navigation = useNavigation();
+
+  const handleContinueShopping = () => {
+    setIsLoading(true); // Show the loader
+
+    // Simulate a delay for navigation (e.g., network request)
+    setTimeout(() => {
+      setIsLoading(false); // Hide the loader
+      navigation.navigate('Main1'); // Navigate to Main1 after loading
+    }, 2000); // Simulated delay (adjust as necessary)
+  };
 
   return (
     <View style={styles.container}>
-      {/* Success Icon */}
       <View style={styles.iconContainer}>
         <View style={styles.iconCircle}>
           <Succesful width={30} height={30} />
@@ -21,12 +31,17 @@ export default function SuccessPage() {
       </Text>
       <Text style={styles.successText}>Successful!</Text>
 
-      {/* Continue Shopping Button */}
+      {/* Continue Shopping Button or Loader */}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Order')} // Navigate to OrderPage (Screen2)
+        onPress={handleContinueShopping} 
+        disabled={isLoading} // Disable button while loading
       >
-        <Text style={styles.buttonText}>Continue Shopping</Text>
+        {isLoading ? (
+          <ActivityIndicator size="small" color="#fff" /> // Show loader
+        ) : (
+          <Text style={styles.buttonText}>Continue Shopping</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -68,11 +83,12 @@ const styles = StyleSheet.create({
     fontFamily: 'pb',
   },
   button: {
-    backgroundColor: '#FFA726',
+    backgroundColor: '#F58731',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 20,
     alignItems: 'center',
+    flexDirection: 'row', // Align text and loader horizontally
   },
   buttonText: {
     color: '#fff',

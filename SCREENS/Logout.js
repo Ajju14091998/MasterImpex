@@ -6,20 +6,22 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  ActivityIndicator,  // Import ActivityIndicator
 } from "react-native";
-// import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useNavigation } from "@react-navigation/native";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import * as ImagePicker from "expo-image-picker";
 import Cart from "../assets/svg/Vector.js";
 import Myorder from "../assets/svg/myorder.js";
 import Logout from "../assets/svg/logout.js";
 
-import AntDesign from "@expo/vector-icons/AntDesign";
-import * as ImagePicker from "expo-image-picker";
-
 export default function Profile() {
+  const navigation = useNavigation();
   const [profileImage, setProfileImage] = useState(
     "https://www.securityforum.org/wp-content/uploads/2022/10/Alex-Jordon-scaled-e1710797283626.jpeg"
   );
   const [selectedGender, setSelectedGender] = useState("Male");
+  const [loading, setLoading] = useState(false);  // Loading state for logout
 
   // Function to handle image upload
   const handleImageUpload = async () => {
@@ -40,6 +42,15 @@ export default function Profile() {
     if (!result.canceled) {
       setProfileImage(result.assets[0].uri);
     }
+  };
+
+  // Function to handle logout
+  const handleLogout = () => {
+    setLoading(true);  // Set loading state to true
+    setTimeout(() => {
+      setLoading(false);  // Set loading state to false after 2 seconds (simulating logout)
+      navigation.navigate("Login");  // Navigate to the login screen
+    }, 2000);
   };
 
   return (
@@ -110,18 +121,30 @@ export default function Profile() {
 
       {/* My Orders */}
       <View style={styles.orderSection}>
-        <TouchableOpacity style={styles.orderButton}>
+        <TouchableOpacity
+          style={styles.orderButton}
+          onPress={() => navigation.navigate("Orderdetails")}
+        >
           <Myorder style={{ width: 50, height: 50, top: 4 }} color="#000" />
-
           <Text style={styles.orderText}>My Order</Text>
           <AntDesign name="arrowright" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
       {/* Logout Button */}
-      <TouchableOpacity style={styles.logoutButton}>
-        <Logout style={{ width: 24, height: 24 }} color="#fff" />
-        <Text style={styles.logoutText}>Log Out</Text>
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={handleLogout}
+        disabled={loading}  // Disable the button while loading
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color="#fff" />  // Show loader when loading is true
+        ) : (
+          <>
+            <Logout style={{ width: 24, height: 24 }} color="#fff" />
+            <Text style={styles.logoutText}>Log Out</Text>
+          </>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -147,7 +170,7 @@ const styles = StyleSheet.create({
   uploadText: {
     fontSize: 14,
     color: "181C2E",
-    fontFamily: 'psb',
+    fontFamily: "psb",
     textAlign: "center",
   },
   infoContainer: {
@@ -170,7 +193,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
     fontSize: 16,
     paddingVertical: 5,
-    fontFamily: 'pr',
+    fontFamily: "pr",
   },
   genderContainer: {
     flexDirection: "row",
@@ -186,12 +209,11 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   genderButtonActive: {
-    // borderColor: "#f57c00",
-    backgroundColor: "orange",
+    backgroundColor: "#F58731",
   },
   genderText: {
     color: "#333",
-    fontFamily: 'pr',
+    fontFamily: "pr",
   },
   genderTextActive: {
     color: "#fff",
@@ -205,7 +227,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 10,
-    // padding: 5,
+    paddingLeft: 5,
+    paddingRight: 5,
   },
   orderIcon: {
     width: 24,
@@ -218,22 +241,22 @@ const styles = StyleSheet.create({
     fontFamily: "psb",
     flex: 1,
     textAlign: "left",
-    // paddingLeft: 10,
   },
   logoutButton: {
-    backgroundColor: "orange", // Orange color for the button
+    backgroundColor: "#F58731",
     borderRadius: 10,
-    paddingVertical: 10, // Adjust vertical padding for spacing
-    paddingHorizontal: 20, // Adjust horizontal padding for spacing
-    flexDirection: "row", // Align icon and text horizontally
-    alignItems: "center", // Center content vertically within the button
-    justifyContent: "center", // Align content to the center horizontally
-    height: 50, // Set the height of the button for consistent layout
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50,
   },
   logoutText: {
-    fontSize: 20, // Set font size to 20 for the text
-    color: "#fff", // White text color
-    fontFamily: 'psb', // Ensure you have 'psb' font loaded
-    marginLeft: 10, // Space between the icon and the text
+    fontSize: 20,
+    color: "#fff",
+    fontFamily: "psb",
+    marginLeft: 10,
   },
 });
+

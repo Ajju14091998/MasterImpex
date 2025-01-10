@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "my-new-app",
+    "name": "Master-Impex",
     "slug": "my-new-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon.png",      
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -12,12 +12,13 @@
       "supportsTablet": true
     },
     "android": {
-      "softInputMode" : "AdjustNothing",
-      "softwareKeyboardLayoutMode" : "pan",
+      "softInputMode": "AdjustNothing",
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/masterimpexicon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ajay0887.mynewapp"
     },
     "web": {
       "bundler": "metro",
@@ -30,7 +31,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -40,6 +41,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d49b0776-6914-40aa-9326-4a12450914f6"
+      }
     }
   }
 }
